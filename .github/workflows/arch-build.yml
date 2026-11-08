@@ -41,3 +41,47 @@ jobs:
         run: meson compile -C build
       - name: Run tests
         run: meson test -C build --print-errorlogs
+      - name: Stage installation
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/pkgroot"
+          DESTDIR="$GITHUB_WORKSPACE/pkgroot" meson install -C build
+      - name: Create x86-64 pacman package
+        run: |
+          version="0.8.0_beta2.r0.g$(git rev-parse --short HEAD)"
+          pkgdir="$GITHUB_WORKSPACE/pkgroot"
+          cat > "$pkgdir/.PKGINFO" <<EOF
+          pkgname = gradience-gnome51
+          pkgbase = gradience-gnome51
+          pkgver = ${version}-1
+          pkgdesc = GTK4 and libadwaita app for theming GNOME, with GNOME Shell 51 support
+          url = https://github.com/mikebll/Gradience
+          builddate = $(date +%s)
+          packager = Gradience fork CI
+          size = $(du -sb "$pkgdir" | cut -f1)
+          arch = x86_64
+          license = GPL-3.0-or-later
+          depend = gtk4
+          depend = libadwaita
+          depend = libsoup3
+          depend = python
+          depend = python-gobject
+          depend = python-lxml
+          depend = python-libsass
+          depend = python-anyascii
+          depend = python-material-color-utilities
+          depend = python-svglib
+          depend = python-yapsy
+          depend = python-jinja
+          EOF
+          mkdir -p "$GITHUB_WORKSPACE/dist"
+          tar --zstd -cf "$GITHUB_WORKSPACE/dist/gradience-gnome51-${version}-x86_64.pkg.tar.zst" -C "$pkgdir" .
+          pacman -Qip "$GITHUB_WORKSPACE/dist/gradience-gnome51-${version}-x86_64.pkg.tar.zst"
+          pacman -U --noconfirm --nodeps "$GITHUB_WORKSPACE/dist/gradience-gnome51-${version}-x86_64.pkg.tar.zst"
+          pacman -Q gradience-gnome51
+      - name: Upload Arch package
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradience-gnome51-x86_64-pkg
+          path: dist/*.pkg.tar.zst
+          if-no-files-found: error
+          retention-days: 30

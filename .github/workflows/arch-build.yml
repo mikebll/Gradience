@@ -75,7 +75,7 @@ jobs:
           depend = python-jinja
           EOF
           mkdir -p "$GITHUB_WORKSPACE/dist"
-          tar --zstd -cf "$GITHUB_WORKSPACE/dist/gradience-gnome51-${version}-x86_64.pkg.tar.zst" -C "$pkgdir" .
+          tar --zstd -cf "$GITHUB_WORKSPACE/dist/gradience-gnome51-${version}-x86_64.pkg.tar.zst" -C "$pkgdir" .PKGINFO usr
           pacman -Qip "$GITHUB_WORKSPACE/dist/gradience-gnome51-${version}-x86_64.pkg.tar.zst"
           pacman -U --noconfirm --nodeps "$GITHUB_WORKSPACE/dist/gradience-gnome51-${version}-x86_64.pkg.tar.zst"
           pacman -Q gradience-gnome51

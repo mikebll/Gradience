@@ -38,8 +38,8 @@ logging = Logger(logger_name="ShellTheme")
 
 
 class ShellTheme:
-    # Supported GNOME Shell versions: 42, 43, 44
-    shell_versions = [42, 43, 44, 45]
+    # Supported GNOME Shell versions: 42, 43, 44, 45, 51
+    shell_versions = [42, 43, 44, 45, 51]
     shell_versions_str = ", ".join(map(str, shell_versions))
     version_target = None
 
@@ -102,6 +102,10 @@ class ShellTheme:
 
         self.main_source = os.path.join(self.source_dir, "gnome-shell.scss")
         self.colors_source = os.path.join(self.source_dir, "gnome-shell-sass", "_colors.scss")
+        if self.version_target == 51:
+            self.colors_source = os.path.join(
+                self.source_dir, "gnome-shell-sass", "_gradience-colors.scss"
+            )
         self.palette_source = os.path.join(self.source_dir, "gnome-shell-sass", "_palette.scss")
         self.switches_source = os.path.join(self.source_dir, "gnome-shell-sass", "widgets", "_switches.scss")
 
@@ -265,18 +269,17 @@ class ShellTheme:
     def _detect_shell_version(self):
         shell_ver = get_shell_version()
 
-        if shell_ver.startswith("3"):
+        try:
+            shell_major = int(shell_ver.split(".", maxsplit=1)[0])
+        except (AttributeError, ValueError):
             raise UnsupportedShellVersion(
                 f"GNOME Shell version {shell_ver} is not supported. (Supported versions: {self.shell_versions_str})")
 
-        if shell_ver.startswith("4"):
-            shell_ver = int(shell_ver[:2])
+        if shell_major not in self.shell_versions:
+            raise UnsupportedShellVersion(
+                f"GNOME Shell version {shell_major} is not supported. (Supported versions: {self.shell_versions_str})")
 
-            if shell_ver in self.shell_versions:
-                self.version_target = shell_ver
-            else:
-                raise UnsupportedShellVersion(
-                    f"GNOME Shell version {shell_ver} is not supported. (Supported versions: {self.shell_versions_str})")
+        self.version_target = shell_major
 
     def reset_theme_async(self, caller:GObject.Object, callback:callable):
         task = Gio.Task.new(caller, None, callback, self._cancellable)

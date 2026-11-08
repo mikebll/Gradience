@@ -3,3 +3,9 @@ install_subdir('templates',
   exclude_files: 'meson.build',
   strip_directory : false
 )
+
+install_subdir('51',
+  install_dir: join_paths(get_option('datadir'), 'gradience', 'shell'),
+  exclude_files: 'meson.build',
+  strip_directory: false
+)

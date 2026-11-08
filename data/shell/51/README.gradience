@@ -1,0 +1,9 @@
+# GNOME Shell 51 theme sources
+
+This directory contains the theme sources from GNOME Shell 51.0, adapted for
+Gradience's generated shell theme. The upstream release archive is available at
+https://download.gnome.org/sources/gnome-shell/51/gnome-shell-51.0.tar.xz.
+
+The upstream Sass files retain their accompanying `gnome-shell-sass/COPYING`
+license notice. Other source files retain their upstream copyright and license
+notices. Gradience-specific templates are in `../templates/51/`.

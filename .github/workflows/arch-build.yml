@@ -47,7 +47,8 @@ jobs:
           DESTDIR="$GITHUB_WORKSPACE/pkgroot" meson install -C build
       - name: Create x86-64 pacman package
         run: |
-          version="0.8.0_beta2.r0.g$(git rev-parse --short HEAD)"
+          short_sha=$(printf '%.7s' "$GITHUB_SHA")
+          version="0.8.0_beta2.r0.g${short_sha}"
           pkgdir="$GITHUB_WORKSPACE/pkgroot"
           cat > "$pkgdir/.PKGINFO" <<EOF
           pkgname = gradience-gnome51
